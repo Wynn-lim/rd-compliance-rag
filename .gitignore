@@ -1,0 +1,8 @@
+data/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+node_modules/
+web/auth.json
+kb_src/

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>研发合规与研发费用管理知识库 · 检索控制台</title>
+<style>
+:root{
+  /* 墨青仪器台 */
+  --ink-0:#0E1319; --ink-1:#151B24; --ink-2:#1B232E; --ink-3:#232D39;
+  --line:#28323E; --line-soft:#1F2833;
+  /* 纸色文字 */
+  --paper:#E6E2D9; --paper-dim:#9AA3AE; --paper-faint:#66707C;
+  /* 语义色 */
+  --seal:#C8442E; --seal-dim:#8E3223; --seal-soft:rgba(200,68,46,.12);
+  --jade:#4A9C85; --jade-soft:rgba(74,156,133,.12);
+  --amber:#C08A3E; --amber-soft:rgba(192,138,62,.12);
+  /* 层色 */
+  --l-route:#7A8FA6; --l-knowledge:#4E7CA8; --l-errata:#4A9C85;
+  --l-ledger:#C8442E; --l-method:#8A7FA8; --l-log:#5A6470;
+
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC",SimSun,"STSong",serif;
+  --sans:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono","Cascadia Mono",Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ink-0);color:var(--paper);
+  font:13.5px/1.75 var(--sans);
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+::selection{background:var(--seal);color:#fff}
+
+/* ---------- 顶栏 ---------- */
+header{
+  background:var(--ink-1);border-bottom:1px solid var(--line);
+  padding:0 22px;height:54px;display:flex;align-items:center;gap:18px;
+  position:sticky;top:0;z-index:20;
+}
+.brand{font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.5px;
+  color:var(--paper);white-space:nowrap}
+.brand em{font-style:normal;color:var(--seal)}
+.sealmark{
+  width:22px;height:22px;border:1.5px solid var(--seal);border-radius:2px;
+  display:grid;place-items:center;font-family:var(--serif);font-size:12px;
+  color:var(--seal);font-weight:700;flex:none;
+}
+.specs{display:flex;gap:14px;font-family:var(--mono);font-size:11px;color:var(--paper-faint);
+  margin-left:auto;white-space:nowrap;overflow:hidden}
+.specs b{color:var(--paper-dim);font-weight:500}
+.specs span{display:flex;gap:5px}
+
+/* ---------- 主体三栏 ---------- */
+.wrap{display:grid;grid-template-columns:1fr 400px;height:calc(100vh - 54px)}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr;height:auto}}
+main{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line)}
+
+/* ---------- 答案流 ---------- */
+#log{flex:1;overflow-y:auto;padding:26px 22px 20px}
+.stream{max-width:760px;margin:0 auto}
+.q{
+  border-left:2px solid var(--seal);padding:2px 0 2px 14px;margin-bottom:18px;
+}
+.q .who{font-family:var(--mono);font-size:10.5px;color:var(--seal);letter-spacing:1.2px;margin-bottom:4px}
+.q .txt{font-family:var(--serif);font-size:16.5px;line-height:1.6;color:var(--paper)}
+
+.card{
+  background:var(--ink-1);border:1px solid var(--line);border-radius:2px;
+  padding:16px 18px;margin-bottom:14px;
+}
+.card pre{white-space:pre-wrap;word-break:break-word;margin:0;font:inherit;color:var(--paper)}
+
+.note{
+  border:1px solid var(--line);border-left:2px solid var(--paper-faint);
+  background:var(--ink-1);padding:12px 15px;margin-bottom:14px;border-radius:2px;
+  font-size:12.5px;color:var(--paper-dim);line-height:1.7;
+}
+.note b{color:var(--paper);font-weight:600}
+.note.mode{border-left-color:var(--jade)}
+
+.readout{
+  background:var(--ink-1);border:1px solid var(--line);border-radius:2px;
+  padding:12px 15px;margin-bottom:14px;font-family:var(--mono);font-size:11.5px;
+  color:var(--paper-dim);line-height:1.9;
+}
+.readout .row{display:flex;gap:10px;flex-wrap:wrap}
+.readout .k{color:var(--paper-faint)}
+.readout .v{color:var(--paper)}
+.readout .layers{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ltag{
+  font-family:var(--sans);font-size:11px;padding:1px 8px;border-radius:2px;
+  border:1px solid;letter-spacing:.3px;
+}
+.l-route{border-color:var(--l-route);color:var(--l-route);background:rgba(122,143,166,.1)}
+.l-knowledge{border-color:var(--l-knowledge);color:var(--l-knowledge);background:rgba(78,124,168,.1)}
+.l-errata{border-color:var(--l-errata);color:var(--l-errata);background:var(--jade-soft)}
+.l-ledger{border-color:var(--l-ledger);color:var(--l-ledger);background:var(--seal-soft)}
+.l-method{border-color:var(--l-method);color:var(--l-method);background:rgba(138,127,168,.1)}
+.l-log{border-color:var(--l-log);color:var(--l-log);background:rgba(90,100,112,.1)}
+
+.reasons{margin:8px 0 0;padding-left:16px;font-family:var(--sans);font-size:12px;color:var(--paper-dim)}
+.reasons li{margin:2px 0}
+.derived{margin-top:8px;font-family:var(--sans);font-size:12px;color:var(--paper-dim)}
+.derived .code{font-family:var(--mono);font-size:11px}
+
+button{
+  border:1px solid var(--seal);background:var(--seal);color:#fff;border-radius:2px;
+  padding:9px 18px;font:600 13px var(--sans);cursor:pointer;letter-spacing:.3px;
+  transition:background .15s;
+}
+button:hover{background:#D6543C}
+button:disabled{opacity:.45;cursor:default}
+button.ghost{background:transparent;color:var(--seal)}
+button.ghost:hover{background:var(--seal-soft)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+/* ---------- 控制台 ---------- */
+.console{border-top:1px solid var(--line);background:var(--ink-1)}
+.tools{display:flex;gap:18px;padding:12px 22px;flex-wrap:wrap;align-items:center;
+  border-bottom:1px solid var(--line-soft)}
+.tools label{font-size:12px;color:var(--paper-dim);display:flex;align-items:center;gap:7px}
+select{font:12px var(--sans);padding:5px 9px;border:1px solid var(--line);border-radius:2px;
+  background:var(--ink-2);color:var(--paper)}
+input[type=checkbox]{width:14px;height:14px;accent-color:var(--seal)}
+.hint{font-family:var(--mono);font-size:11px;color:var(--paper-faint);margin-left:auto}
+
+form{display:flex;gap:12px;padding:14px 22px;align-items:center}
+.prompt{font-family:var(--mono);color:var(--seal);font-size:16px;flex:none;user-select:none}
+input[type=text]{
+  flex:1;border:0;border-bottom:1px solid var(--line);background:transparent;
+  padding:9px 2px;font:14px var(--sans);color:var(--paper);
+}
+input[type=text]::placeholder{color:var(--paper-faint);font-family:var(--mono);font-size:12.5px}
+input[type=text]:focus{outline:none;border-bottom-color:var(--seal)}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 22px 14px}
+.chip{border:1px solid var(--line);background:var(--ink-2);border-radius:2px;
+  padding:5px 11px;font-size:12px;color:var(--paper-dim);cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--seal);color:var(--paper)}
+
+/* ---------- 出处登记簿 ---------- */
+aside{background:var(--ink-1);overflow-y:auto;padding:18px 16px}
+aside h2{
+  font-family:var(--serif);font-size:13px;font-weight:700;color:var(--paper-dim);
+  margin:0 0 4px;letter-spacing:1px;display:flex;align-items:center;gap:8px;
+}
+aside h2::after{content:"";flex:1;height:1px;background:var(--line)}
+aside h2.sub{margin-top:22px}
+.ledger-count{font-family:var(--mono);font-size:10.5px;color:var(--paper-faint);margin:0 0 14px}
+
+.entry{
+  border:1px solid var(--line);border-left-width:3px;border-radius:2px;
+  background:var(--ink-2);margin-bottom:9px;cursor:pointer;transition:border-color .15s;
+}
+.entry:hover{border-color:var(--ink-3);border-left-color:currentColor}
+.entry .head{padding:10px 12px 8px}
+.entry .doc{
+  font-family:var(--mono);font-size:14px;font-weight:600;color:var(--paper);
+  letter-spacing:.3px;line-height:1.4;word-break:break-all;
+}
+.entry .meta{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.entry .sec{font-size:11.5px;color:var(--paper-dim);margin-top:5px;line-height:1.5}
+.entry .path{font-family:var(--mono);font-size:10px;color:var(--paper-faint);
+  margin-top:4px;word-break:break-all}
+.entry .docs{font-family:var(--mono);font-size:10px;color:var(--paper-faint);margin-top:4px}
+.entry .body{
+  display:none;border-top:1px dashed var(--line);margin-top:9px;padding-top:9px;
+  font-size:11.5px;color:var(--paper-dim);max-height:340px;overflow-y:auto;line-height:1.75;
+}
+.entry.open .body{display:block}
+/* 出处原文的精简 markdown 渲染 */
+.entry .body p{margin:0 0 7px}
+.entry .body b{color:var(--paper);font-weight:600}
+.entry .body code{font-family:var(--mono);font-size:10.5px;color:var(--amber);
+  background:var(--ink-0);padding:1px 4px;border-radius:2px}
+.entry .body h{display:block;font-family:var(--serif);font-size:12.5px;font-weight:700;
+  color:var(--paper);margin:11px 0 6px}
+.entry .body li{margin:2px 0;padding-left:13px;position:relative;list-style:none}
+.entry .body li::before{content:"·";position:absolute;left:2px;color:var(--paper-faint)}
+.entry .body blockquote{margin:7px 0;padding:2px 0 2px 11px;
+  border-left:2px solid var(--seal-dim);color:var(--paper)}
+.entry .body hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+.entry .body table{width:100%;border-collapse:collapse;margin:8px 0;font-size:10.5px;table-layout:fixed}
+.entry .body table td{border:1px solid var(--line);padding:4px 7px;vertical-align:top;
+  word-break:break-word}
+.entry .body table td:first-child{width:24%}
+.entry .body table tr:first-child td{background:var(--ink-0);color:var(--paper-dim);
+  font-family:var(--mono);font-size:10px}
+.entry.e-route{border-left-color:var(--l-route)}
+.entry.e-knowledge{border-left-color:var(--l-knowledge)}
+.entry.e-errata{border-left-color:var(--jade);background:rgba(74,156,133,.05)}
+.entry.e-ledger{border-left-color:var(--l-ledger)}
+.entry.e-method{border-left-color:var(--l-method)}
+.entry.e-log{border-left-color:var(--l-log)}
+
+.status{font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:2px;
+  border:1px solid var(--line);color:var(--paper-faint)}
+.status.l3,.status.l4{border-color:var(--seal-dim);color:var(--seal)}
+
+/* 仪表读数 */
+.meter{width:56px;height:5px;background:var(--ink-0);border:1px solid var(--line);
+  border-radius:1px;position:relative;overflow:hidden;flex:none}
+.meter i{position:absolute;inset:0 auto 0 0;background:var(--seal);display:block;
+  transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.readval{font-family:var(--mono);font-size:10px;color:var(--paper-faint);margin-left:auto}
+
+.stamp{
+  font-family:var(--serif);font-size:10px;color:var(--jade);border:1px solid var(--jade);
+  padding:0 5px;border-radius:1px;letter-spacing:1px;
+}
+.empty{color:var(--paper-faint);font-size:12px;text-align:center;padding:36px 8px;line-height:1.9}
+.empty .big{font-family:var(--serif);font-size:14px;color:var(--paper-dim);display:block;margin-bottom:6px}
+
+/* prompt 弹窗 */
+.modal{position:fixed;inset:0;background:rgba(6,9,13,.82);z-index:99;
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.modal .box{background:var(--ink-1);border:1px solid var(--line);border-radius:2px;
+  max-width:900px;width:100%;max-height:86vh;display:flex;flex-direction:column}
+.modal .bar{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;
+  align-items:center;gap:12px}
+.modal .bar b{font-family:var(--serif);font-size:14px}
+.modal .bar span{color:var(--paper-faint);font-size:12px}
+.modal textarea{flex:1;border:0;padding:16px 18px;font-family:var(--mono);font-size:11.5px;
+  line-height:1.7;resize:none;outline:none;background:var(--ink-0);color:var(--paper-dim)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="sealmark">研</div>
+  <div class="brand">研发合规与研发费用管理<em>知识库</em></div>
+  <div class="specs">
+    <span><b>3,823</b> 分块</span>
+    <span><b>四层</b> 索引</span>
+    <span><b>807</b> 条勘误</span>
+    <span><b>70</b> 条目</span>
+    <a href="/logout" id="logout" style="display:none;color:var(--paper-faint);
+      text-decoration:none;font-family:var(--sans);font-size:11.5px;
+      border:1px solid var(--line);border-radius:2px;padding:2px 9px">退出</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+    <div id="log"><div class="stream"><div class="empty">
+      <span class="big">分层检索 · 答必有源</span>
+      路由 → 知识 → 纠错 → 台账<br>输入问题，或点下方快捷检索开始
+    </div></div></div>
+
+    <div class="console">
+      <div class="tools">
+        <label>top-k
+          <select id="topk"><option>4</option><option selected>6</option><option>8</option><option>12</option></select>
+        </label>
+        <label>生成后端
+          <select id="backend">
+            <option value="none" selected>导出 prompt</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="openai">OpenAI 兼容</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="dense" checked> 向量检索</label>
+        <span class="hint" id="health">…</span>
+      </div>
+      <div class="chips" id="chips"></div>
+      <form id="f">
+        <span class="prompt">›</span>
+        <input type="text" id="q" placeholder="检索知识库，例如：委托境外研发费用的加计基数怎么算？" autocomplete="off">
+        <button type="submit" id="go">检索</button>
+      </form>
+    </div>
+  </main>
+
+  <aside>
+    <h2>出处登记簿</h2>
+    <p class="ledger-count" id="cnt">尚未检索</p>
+    <div id="srcs"></div>
+  </aside>
+</div>
+
+<script>
+const EXAMPLES = [
+  "研发费用加计扣除现在的比例是多少？未形成无形资产、形成无形资产分别怎么处理？",
+  "集成电路和工业母机企业的加计扣除比例是多少？到什么时候？",
+  "委托境内研发的加计基数是多少？委托境外呢？",
+  "高企认定研发费用占销售收入比例分几档？",
+  "研发支出资本化的五个条件是什么？",
+  "委托研发的「知识产权归属」是不是加计扣除的门槛？",
+  "2026 年制造业企业研发费用加计扣除比例是不是已提高到 120%？",
+  "国家税务总局公告 2015 年第 97 号现在还有效吗？",
+  "研发费用监管有哪几个口径？",
+  "加计扣除的行业负面清单有哪些？",
+];
+const log=document.getElementById('log'), srcs=document.getElementById('srcs');
+const chips=document.getElementById('chips');
+EXAMPLES.slice(0,6).forEach(t=>{
+  const b=document.createElement('span'); b.className='chip';
+  b.textContent=t.length>24?t.slice(0,24)+'…':t; b.title=t;
+  b.onclick=()=>{document.getElementById('q').value=t; document.getElementById('f').requestSubmit();};
+  chips.appendChild(b);
+});
+
+fetch('/api/health').then(r=>r.json()).then(d=>{
+  const has=d.backends&&d.backends.length>1;
+  document.getElementById('health').textContent = has
+    ? '后端就绪：'+d.backends.filter(b=>b!=='none').join(' / ')
+    : '未配置 API key · 用「导出 prompt」';
+  if(d.auth) document.getElementById('logout').style.display='';
+}).catch(()=>document.getElementById('health').textContent='服务未连接');
+
+document.getElementById('f').onsubmit = async (e)=>{
+  e.preventDefault();
+  const q=document.getElementById('q').value.trim();
+  if(!q) return;
+  if(log.querySelector('.empty')) log.innerHTML='';
+  const box=document.createElement('div'); box.className='stream';
+  box.innerHTML=`<div class="q"><div class="who">查询</div><div class="txt">${esc(q)}</div></div>
+    <div class="card" id="pending">检索中…</div>`;
+  log.appendChild(box); log.scrollTop=log.scrollHeight;
+  document.getElementById('go').disabled=true;
+  try{
+    const r=await fetch('/api/ask',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({query:q, top_k:+document.getElementById('topk').value,
+        backend:document.getElementById('backend').value,
+        dense:document.getElementById('dense').checked})});
+    const d=await r.json();
+    if(d.error){ renderError(box,d); return; }
+    render(box,d);
+  }catch(err){
+    box.querySelector('.card').innerHTML=`<b style="color:var(--seal)">请求失败</b><pre>${esc(String(err))}</pre>`;
+  }finally{ document.getElementById('go').disabled=false; log.scrollTop=log.scrollHeight; }
+};
+
+function renderError(box,d){
+  box.querySelector('.card').className='note';
+  box.querySelector('.card').style.borderLeftColor='var(--seal)';
+  box.querySelector('.card').innerHTML =
+    `<b style="color:var(--seal)">${esc(d.error)}</b>` +
+    (d.hint?`<pre style="white-space:pre-wrap;margin:8px 0 0;font:12px/1.7 var(--mono);color:var(--paper-dim)">${esc(d.hint)}</pre>`:'');
+}
+
+function render(box,d){
+  const a=box.querySelector('.card');
+  let html='';
+  if(d.answer){
+    html+=`<pre>${esc(d.answer)}</pre>`;
+  }else{
+    html+=`<div class="note mode" style="margin:0"><b>导出 prompt 模式</b> — 已按知识库系统提示词正本
+      + 注入的输出契约，把下方出处组装成完整 prompt。复制后粘给任意模型
+      （豆包 / DeepSeek / Kimi / ChatGPT），即得到结论先行、分口径、带 M 编号与文号出处的回答。</div>`;
+  }
+  const rt=d.retrieval||{};
+  html+=`<div class="readout">
+    <div class="layers">${(rt.layers||[]).map(l=>`<span class="ltag l-${l}">${esc(layerCN(l))}</span>`).join('')}</div>
+    <div class="row" style="margin-top:9px">
+      <span><span class="k">候选</span> <span class="v">${rt.candidates||0}</span></span>
+      <span><span class="k">融合</span> <span class="v">${rt.fused||0}</span></span>
+      <span><span class="k">耗时</span> <span class="v">${rt.latency_ms||0} ms</span></span>
+      <span><span class="k">向量</span> <span class="v">${rt.dense?'开':'关'}</span></span>
+    </div>
+    ${rt.relevant===false?`<div class="row" style="margin-top:8px"><span class="k">判定</span>
+      <span class="v" style="color:var(--amber)">${esc(rt.relevance_reason||'')}</span></div>`:''}
+    ${rt.reasons&&rt.reasons.length?`<ul class="reasons">${rt.reasons.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    ${rt.route_codes&&rt.route_codes.length?`<div class="derived">路由反推条目
+      ${rt.route_codes.slice(0,10).map(c=>`<span class="code">${esc(c)}</span>`).join(' ')}</div>`:''}
+  </div>`;
+  a.innerHTML=html;
+  if(!d.answer){
+    const btn=document.createElement('button'); btn.className='ghost'; btn.textContent='复制完整 prompt';
+    btn.style.marginTop='12px'; btn.onclick=()=>copyPrompt(d.query,btn);
+    a.appendChild(btn);
+  }
+  renderLedger(d);
+}
+
+function layerCN(l){
+  return {route:'路由层',knowledge:'知识层',errata:'纠错层',ledger:'台账层',
+          method:'治理层',log:'时间线'}[l]||l;
+}
+
+function renderLedger(d){
+  const has = (d.sources&&d.sources.length) || (d.errata_warnings&&d.errata_warnings.length);
+  document.getElementById('cnt').textContent = has
+    ? `${(d.sources||[]).length} 条正文 · ${(d.errata_warnings||[]).length} 条纠错`
+    : '未检索到相关内容（库内暂无）';
+  srcs.innerHTML='';
+  if(!has){
+    srcs.innerHTML='<div class="empty"><span class="big">库内暂无</span>本题的专有实体在库内覆盖率不足，已按纪律判为查无此内容。</div>';
+    return;
+  }
+  (d.sources||[]).forEach(s=>{
+    const code=s.m_code||s.e_code||s.rel_path.split('/').pop();
+    const el=document.createElement('div');
+    el.className='entry e-'+(s.layer||'log');
+    el.innerHTML=`<div class="head">
+        <div class="doc">${esc(code)}</div>
+        <div class="meta">
+          <span class="ltag l-${s.layer}">${esc(layerCN(s.layer))}</span>
+          ${s.status?`<span class="status ${(s.status||'').toLowerCase()}">${esc(s.status)}</span>`:''}
+          <div class="meter"><i style="width:0"></i></div>
+          <span class="readval">${s.score}</span>
+        </div>
+        <div class="sec">${esc(s.section||'')}</div>
+        <div class="path">${esc(s.rel_path)}</div>
+        ${s.doc_ids&&s.doc_ids.length?`<div class="docs">文号 ${s.doc_ids.slice(0,5).map(esc).join(' · ')}</div>`:''}
+        <div class="body">${md(s.text||'')}</div>
+      </div>`;
+    el.onclick=()=>el.classList.toggle('open');
+    srcs.appendChild(el);
+    // 仪表读数动画（尊重 reduced-motion）
+    const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const pct=Math.max(4,Math.min(100,(s.score||0)*900));
+    requestAnimationFrame(()=>{ el.querySelector('.meter i').style.width=pct+'%'; });
+  });
+  if(d.errata_warnings&&d.errata_warnings.length){
+    const h=document.createElement('h2'); h.className='sub'; h.textContent='纠错层 · 防污染';
+    srcs.appendChild(h);
+    d.errata_warnings.forEach(w=>{
+      const el=document.createElement('div'); el.className='entry e-errata';
+      el.innerHTML=`<div class="head">
+          <div class="doc">${esc(w.e_code||'过程笔记')}</div>
+          <div class="meta"><span class="stamp">已勘误</span>
+            <span class="readval">${w.score}</span></div>
+          <div class="sec">${esc(w.section||'')}</div>
+          <div class="body">${md(w.text||'')}</div>
+        </div>`;
+      el.onclick=()=>el.classList.toggle('open');
+      srcs.appendChild(el);
+    });
+  }
+}
+
+async function copyPrompt(q,btn){
+  if(btn){btn.disabled=true;btn.textContent='生成中…';}
+  let t='';
+  try{
+    const r=await fetch('/api/prompt',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({query:q, top_k:+document.getElementById('topk').value,
+        dense:document.getElementById('dense').checked})});
+    t=await r.text();
+  }catch(e){ alert('获取 prompt 失败：'+e); return; }
+  finally{ if(btn){btn.disabled=false;btn.textContent='复制完整 prompt';} }
+  try{
+    if(!navigator.clipboard||!navigator.clipboard.writeText) throw new Error('no api');
+    await navigator.clipboard.writeText(t);
+    alert(`完整 prompt 已复制（${t.length} 字），直接粘给任意模型即可`);
+  }catch(e){ showModal(t); }
+}
+
+function showModal(text){
+  const old=document.getElementById('m'); if(old) old.remove();
+  const w=document.createElement('div'); w.className='modal'; w.id='m';
+  w.innerHTML=`<div class="box">
+      <div class="bar"><b>完整 prompt</b><span>${text.length} 字 · 全选后 Ctrl+C</span>
+        <button class="ghost" style="margin-left:auto" id="mc">关闭</button></div>
+      <textarea readonly></textarea></div>`;
+  document.body.appendChild(w);
+  const ta=w.querySelector('textarea'); ta.value=text; ta.focus(); ta.select();
+  w.querySelector('#mc').onclick=()=>w.remove();
+  w.onclick=e=>{if(e.target===w)w.remove();};
+}
+
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"']/g,
+  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* 知识库原文的精简 markdown 渲染：表格、粗体、行内代码、引用、标题、列表 */
+function md(src){
+  if(!src) return '';
+  const lines=src.split('\n');
+  const inline=s=>esc(s)
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>');
+  const out=[]; let i=0;
+  while(i<lines.length){
+    const ln=lines[i];
+    if(/^\s*\|.*\|\s*$/.test(ln)){
+      const rows=[];
+      while(i<lines.length && /^\s*\|.*\|\s*$/.test(lines[i])){
+        const cells=lines[i].trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+        if(!/^[-:\s]*$/.test(cells.join(''))) rows.push(cells);
+        i++;
+      }
+      if(rows.length) out.push('<table>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+inline(c)+'</td>').join('')+'</tr>').join('')+'</table>');
+      continue;
+    }
+    if(/^#{1,4}\s/.test(ln)){ out.push('<h>'+inline(ln.replace(/^#+\s*/,''))+'</h>'); i++; continue; }
+    if(/^\s*[-*]\s/.test(ln)){ out.push('<li>'+inline(ln.replace(/^\s*[-*]\s*/,''))+'</li>'); i++; continue; }
+    if(/^\s*>\s?/.test(ln)){ out.push('<blockquote>'+inline(ln.replace(/^\s*>\s?/,''))+'</blockquote>'); i++; continue; }
+    if(/^\s*(-{3,}|={3,})\s*$/.test(ln)){ out.push('<hr>'); i++; continue; }
+    if(ln.trim()===''){ i++; continue; }
+    out.push('<p>'+inline(ln)+'</p>'); i++;
+  }
+  return out.join('');
+}
+</script>
+</body>
+</html>

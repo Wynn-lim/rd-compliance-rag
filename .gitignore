@@ -6,3 +6,4 @@ __pycache__/
 node_modules/
 web/auth.json
 kb_src/
+scripts/sensitive_words.txt
